@@ -1,0 +1,208 @@
+basePath: /
+definitions:
+  model.ApiResponse:
+    properties:
+      code:
+        example: 400
+        format: int
+        type: integer
+      message:
+        format: string
+        type: string
+    type: object
+  model.CreateMarkdownSnippet:
+    properties:
+      body:
+        description: Markdown body to save.
+        maxLength: 1024
+        minLength: 1
+        type: string
+    required:
+    - body
+    type: object
+  model.MarkdownSnippet:
+    properties:
+      body:
+        description: Markdown body to save.
+        minLength: 1
+        type: string
+      createDate:
+        description: Date markdown snippet was created
+        format: date-time
+        readOnly: true
+        type: string
+      id:
+        description: Markdown snippet guid.
+        format: uuid
+        type: string
+    required:
+    - body
+    type: object
+  model.MarkdownSnippetListItem:
+    properties:
+      createDate:
+        description: Date markdown snippet was created
+        format: date-time
+        readOnly: true
+        type: string
+      id:
+        description: Markdown snippet guid.
+        format: uuid
+        type: string
+    type: object
+  model.UpdateMarkdownSnippet:
+    properties:
+      body:
+        description: Markdown body to save.
+        minLength: 1
+        type: string
+      id:
+        description: Markdown snippet guid.
+        format: uuid
+        type: string
+    required:
+    - body
+    type: object
+host: localhost:3000
+info:
+  contact: {}
+  description: Backend API for storing and retrieving markdown snippets
+  title: SouLxSnippets
+  version: "1.0"
+paths:
+  /md:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.MarkdownSnippetListItem'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ApiResponse'
+      summary: Retrieve All Markdown Snippets
+      tags:
+      - md
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Patch Body
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/model.UpdateMarkdownSnippet'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.MarkdownSnippet'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ApiResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ApiResponse'
+      summary: Updates a markdown snippet
+      tags:
+      - md
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Post Body
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateMarkdownSnippet'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.MarkdownSnippet'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ApiResponse'
+      summary: Create new a markdown snippet
+      tags:
+      - md
+  /md/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Snippet uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ApiResponse'
+      summary: Removes MarkdownSnippet permanantly
+      tags:
+      - md
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Snippet uuid
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.MarkdownSnippet'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ApiResponse'
+      summary: Retrieve Markdown Snippet
+      tags:
+      - md
+swagger: "2.0"
+tags:
+- name: md

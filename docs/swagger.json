@@ -1,0 +1,310 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Backend API for storing and retrieving markdown snippets",
+        "title": "SouLxSnippets",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:3000",
+    "basePath": "/",
+    "paths": {
+        "/md": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "md"
+                ],
+                "summary": "Retrieve All Markdown Snippets",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.MarkdownSnippetListItem"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ApiResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "md"
+                ],
+                "summary": "Create new a markdown snippet",
+                "parameters": [
+                    {
+                        "description": "Post Body",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.CreateMarkdownSnippet"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.MarkdownSnippet"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ApiResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "md"
+                ],
+                "summary": "Updates a markdown snippet",
+                "parameters": [
+                    {
+                        "description": "Patch Body",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.UpdateMarkdownSnippet"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.MarkdownSnippet"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ApiResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/model.ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/md/{id}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "md"
+                ],
+                "summary": "Retrieve Markdown Snippet",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Snippet uuid",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.MarkdownSnippet"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ApiResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "md"
+                ],
+                "summary": "Removes MarkdownSnippet permanantly",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Snippet uuid",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ApiResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "model.ApiResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "format": "int",
+                    "example": 400
+                },
+                "message": {
+                    "type": "string",
+                    "format": "string"
+                }
+            }
+        },
+        "model.CreateMarkdownSnippet": {
+            "type": "object",
+            "required": [
+                "body"
+            ],
+            "properties": {
+                "body": {
+                    "description": "Markdown body to save.",
+                    "type": "string",
+                    "maxLength": 1024,
+                    "minLength": 1
+                }
+            }
+        },
+        "model.MarkdownSnippet": {
+            "type": "object",
+            "required": [
+                "body"
+            ],
+            "properties": {
+                "body": {
+                    "description": "Markdown body to save.",
+                    "type": "string",
+                    "minLength": 1
+                },
+                "createDate": {
+                    "description": "Date markdown snippet was created",
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                },
+                "id": {
+                    "description": "Markdown snippet guid.",
+                    "type": "string",
+                    "format": "uuid"
+                }
+            }
+        },
+        "model.MarkdownSnippetListItem": {
+            "type": "object",
+            "properties": {
+                "createDate": {
+                    "description": "Date markdown snippet was created",
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                },
+                "id": {
+                    "description": "Markdown snippet guid.",
+                    "type": "string",
+                    "format": "uuid"
+                }
+            }
+        },
+        "model.UpdateMarkdownSnippet": {
+            "type": "object",
+            "required": [
+                "body"
+            ],
+            "properties": {
+                "body": {
+                    "description": "Markdown body to save.",
+                    "type": "string",
+                    "minLength": 1
+                },
+                "id": {
+                    "description": "Markdown snippet guid.",
+                    "type": "string",
+                    "format": "uuid"
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "md"
+        }
+    ]
+}
