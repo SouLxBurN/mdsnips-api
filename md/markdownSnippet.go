@@ -5,19 +5,19 @@ import "time"
 // MarkdownSnippet
 type MarkdownSnippet struct {
 	// Markdown snippet guid.
-	ID string `json:"id,omitempty" format:"uuid"`
+	ID string `json:"id,omitempty" bson:"id" format:"uuid"`
 	// Markdown body to save.
-	Body string `json:"body" example:"# Markdown Snippet\nSome Text"`
+	Body string `json:"body" bson:"body" example:"# Markdown Snippet\nSome Text"`
 	// Date markdown snippet was created
-	CreateDate time.Time `json:"createDate,omitempty" format:"date-time"`
+	CreateDate time.Time `json:"createDate,omitempty" bson:"createDate" format:"date-time"`
 }
 
 // MDListItem
 type MDListItem struct {
 	// Markdown snippet guid.
-	ID string `json:"id,omitempty" format:"uuid"`
+	ID string `json:"id,omitempty" bson:"id" format:"uuid"`
 	// Date markdown snippet was created
-	CreateDate time.Time `json:"createDate,omitempty" format:"date-time"`
+	CreateDate time.Time `json:"createDate,omitempty" bson:"createDate" format:"date-time"`
 }
 
 // CreateMDReq

@@ -1,4 +1,3 @@
-basePath: /
 definitions:
   api.ErrorResponse:
     properties:

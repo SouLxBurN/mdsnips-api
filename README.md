@@ -16,8 +16,10 @@ fresh
 ```
 
 ### Regenerating Swagger Documentation
+
 Run the following in the project root:
 ```
 swag init
 ```
 
+Swagger documentation is hosted at `/swagger/index.html`

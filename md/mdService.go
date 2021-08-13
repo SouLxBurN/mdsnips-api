@@ -45,7 +45,7 @@ func GetMarkdownSnippet(uuid string) (*MarkdownSnippet, error) {
 	snippet := new(MarkdownSnippet)
 	filter := bson.D{{Key: "id", Value: uuid}}
 	if err := mdCollection.FindOne(ctx, filter).Decode(snippet); err != nil {
-		if err == mongo.ErrNoDocuments {
+		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, nil
 		}
 		return nil, err
@@ -66,7 +66,7 @@ func GetAllMarkdownSnippets() (*[]MDListItem, error) {
 	opts := options.Find().SetProjection(bson.M{"id": 1, "createDate": 1})
 	cursor, err := mdCollection.Find(ctx, filter, opts)
 	if err != nil {
-		if err == mongo.ErrNoDocuments {
+		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, nil
 		}
 		return nil, err

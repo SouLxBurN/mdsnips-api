@@ -340,7 +340,7 @@ type swaggerInfo struct {
 var SwaggerInfo = swaggerInfo{
 	Version:     "1.0",
 	Host:        "localhost:3000",
-	BasePath:    "/",
+	BasePath:    "",
 	Schemes:     []string{},
 	Title:       "SouLxSnippets",
 	Description: "Backend API for storing and retrieving markdown snippets",

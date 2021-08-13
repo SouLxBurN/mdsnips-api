@@ -1,7 +1,8 @@
 package main
 
 import (
-	"os"
+	"flag"
+	"strconv"
 
 	"github.com/soulxburn/soulxsnips/api"
 
@@ -16,17 +17,14 @@ import (
 // @description Backend API for storing and retrieving markdown snippets
 // @tag.name md
 // @host localhost:3000
-// @BasePath /
+// @BasePath
 func main() {
 	fiberApp := fiber.New()
 	fiberApp.Get("/swagger/*", swagger.Handler)
+	api.ConfigureBasicAuth(fiberApp)
 	api.ConfigureRoutes(fiberApp)
 
-	var port string
-	if len(os.Args) > 1 {
-		port = os.Args[1]
-	} else {
-		port = ":3000"
-	}
-	fiberApp.Listen(port)
+	port := flag.Int("port", 3000, "port to listen on")
+	flag.Parse()
+	fiberApp.Listen(":" + strconv.Itoa(*port))
 }

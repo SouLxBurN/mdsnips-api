@@ -5,6 +5,9 @@ import (
 	"github.com/soulxburn/soulxsnips/md"
 )
 
+// ConfiugureRoutes
+// Imports and configures various routes for
+// all modules.
 func ConfigureRoutes(app *fiber.App) {
 	app.Post("/md", md.CreateMDHandler)
 	app.Patch("/md", md.UpdateMDHandler)
