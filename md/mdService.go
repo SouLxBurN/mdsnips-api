@@ -1,12 +1,12 @@
-package service
+package md
 
 import (
 	"context"
 	"errors"
 	"log"
-	"soulxsnips/src/client"
-	"soulxsnips/src/model"
 	"time"
+
+	"github.com/soulxburn/soulxsnips/client"
 
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
@@ -16,12 +16,12 @@ import (
 
 // CreateMarkdownSnippet
 // Errors are returned to the caller
-func CreateMarkdownSnippet(mdSnip *model.CreateMarkdownSnippet) (*model.MarkdownSnippet, error) {
+func CreateMarkdownSnippet(mdSnip *CreateMDReq) (*MarkdownSnippet, error) {
 	mdCollection := getMarkdownCollection()
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	newSnip := &model.MarkdownSnippet{
+	newSnip := &MarkdownSnippet{
 		ID:         uuid.New().String(),
 		Body:       mdSnip.Body,
 		CreateDate: time.Now(),
@@ -37,12 +37,12 @@ func CreateMarkdownSnippet(mdSnip *model.CreateMarkdownSnippet) (*model.Markdown
 
 // GetMarkdownSnippet
 // Errors are returned to the caller
-func GetMarkdownSnippet(uuid string) (*model.MarkdownSnippet, error) {
+func GetMarkdownSnippet(uuid string) (*MarkdownSnippet, error) {
 	mdCollection := getMarkdownCollection()
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	snippet := new(model.MarkdownSnippet)
+	snippet := new(MarkdownSnippet)
 	filter := bson.D{{Key: "id", Value: uuid}}
 	if err := mdCollection.FindOne(ctx, filter).Decode(snippet); err != nil {
 		if err == mongo.ErrNoDocuments {
@@ -56,12 +56,12 @@ func GetMarkdownSnippet(uuid string) (*model.MarkdownSnippet, error) {
 // GetAllMarkdownSnippets
 // Gets all Markdown Snippets without body
 // Errors are returned to the caller
-func GetAllMarkdownSnippets() (*[]model.MarkdownSnippetListItem, error) {
+func GetAllMarkdownSnippets() (*[]MDListItem, error) {
 	mdCollection := getMarkdownCollection()
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	snippets := make([]model.MarkdownSnippetListItem, 0)
+	snippets := make([]MDListItem, 0)
 	filter := bson.D{}
 	opts := options.Find().SetProjection(bson.M{"id": 1, "createDate": 1})
 	cursor, err := mdCollection.Find(ctx, filter, opts)
@@ -81,7 +81,7 @@ func GetAllMarkdownSnippets() (*[]model.MarkdownSnippetListItem, error) {
 
 // UpdateMarkdownSnippet
 // Errors are returned to the caller
-func UpdateMarkdownSnippet(patch *model.UpdateMarkdownSnippet) (*model.MarkdownSnippet, error) {
+func UpdateMarkdownSnippet(patch *UpdateMDReq) (*MarkdownSnippet, error) {
 	mdCollection := getMarkdownCollection()
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()

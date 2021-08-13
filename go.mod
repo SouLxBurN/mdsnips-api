@@ -1,4 +1,4 @@
-module soulxsnips
+module github.com/soulxburn/soulxsnips
 
 go 1.16
 

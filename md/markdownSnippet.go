@@ -1,4 +1,4 @@
-package model
+package md
 
 import "time"
 
@@ -12,22 +12,22 @@ type MarkdownSnippet struct {
 	CreateDate time.Time `json:"createDate,omitempty" format:"date-time"`
 }
 
-// MarkdownSnippetListItem
-type MarkdownSnippetListItem struct {
+// MDListItem
+type MDListItem struct {
 	// Markdown snippet guid.
 	ID string `json:"id,omitempty" format:"uuid"`
 	// Date markdown snippet was created
 	CreateDate time.Time `json:"createDate,omitempty" format:"date-time"`
 }
 
-// CreateMarkdownSnippet
-type CreateMarkdownSnippet struct {
+// CreateMDReq
+type CreateMDReq struct {
 	// Markdown body to save.
 	Body string `json:"body" validate:"required,min=1,max=1024" minLength:"1" maxLength:"1024"`
 }
 
 // UpdateMarkdownSnippet
-type UpdateMarkdownSnippet struct {
+type UpdateMDReq struct {
 	// Markdown snippet guid.
 	ID string `json:"id,omitempty" format:"uuid" validate:"required"`
 	// Markdown body to save.

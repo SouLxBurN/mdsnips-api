@@ -42,20 +42,20 @@ var doc = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/model.MarkdownSnippetListItem"
+                                "$ref": "#/definitions/md.MDListItem"
                             }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/model.ApiResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/model.ApiResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     }
                 }
@@ -78,7 +78,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.CreateMarkdownSnippet"
+                            "$ref": "#/definitions/md.CreateMDReq"
                         }
                     }
                 ],
@@ -86,19 +86,19 @@ var doc = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/model.MarkdownSnippet"
+                            "$ref": "#/definitions/md.MarkdownSnippet"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/model.ApiResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/model.ApiResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     }
                 }
@@ -121,7 +121,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.UpdateMarkdownSnippet"
+                            "$ref": "#/definitions/md.UpdateMDReq"
                         }
                     }
                 ],
@@ -129,25 +129,25 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.MarkdownSnippet"
+                            "$ref": "#/definitions/md.MarkdownSnippet"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/model.ApiResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/model.ApiResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/model.ApiResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     }
                 }
@@ -178,19 +178,19 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.MarkdownSnippet"
+                            "$ref": "#/definitions/md.MarkdownSnippet"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/model.ApiResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/model.ApiResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     }
                 }
@@ -222,7 +222,13 @@ var doc = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/model.ApiResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     }
                 }
@@ -230,7 +236,7 @@ var doc = `{
         }
     },
     "definitions": {
-        "model.ApiResponse": {
+        "api.ErrorResponse": {
             "type": "object",
             "properties": {
                 "code": {
@@ -244,7 +250,7 @@ var doc = `{
                 }
             }
         },
-        "model.CreateMarkdownSnippet": {
+        "md.CreateMDReq": {
             "type": "object",
             "required": [
                 "body"
@@ -258,22 +264,13 @@ var doc = `{
                 }
             }
         },
-        "model.MarkdownSnippet": {
+        "md.MDListItem": {
             "type": "object",
-            "required": [
-                "body"
-            ],
             "properties": {
-                "body": {
-                    "description": "Markdown body to save.",
-                    "type": "string",
-                    "minLength": 1
-                },
                 "createDate": {
                     "description": "Date markdown snippet was created",
                     "type": "string",
-                    "format": "date-time",
-                    "readOnly": true
+                    "format": "date-time"
                 },
                 "id": {
                     "description": "Markdown snippet guid.",
@@ -282,14 +279,18 @@ var doc = `{
                 }
             }
         },
-        "model.MarkdownSnippetListItem": {
+        "md.MarkdownSnippet": {
             "type": "object",
             "properties": {
+                "body": {
+                    "description": "Markdown body to save.",
+                    "type": "string",
+                    "example": "# Markdown Snippet\nSome Text"
+                },
                 "createDate": {
                     "description": "Date markdown snippet was created",
                     "type": "string",
-                    "format": "date-time",
-                    "readOnly": true
+                    "format": "date-time"
                 },
                 "id": {
                     "description": "Markdown snippet guid.",
@@ -298,15 +299,17 @@ var doc = `{
                 }
             }
         },
-        "model.UpdateMarkdownSnippet": {
+        "md.UpdateMDReq": {
             "type": "object",
             "required": [
-                "body"
+                "body",
+                "id"
             ],
             "properties": {
                 "body": {
                     "description": "Markdown body to save.",
                     "type": "string",
+                    "maxLength": 1024,
                     "minLength": 1
                 },
                 "id": {

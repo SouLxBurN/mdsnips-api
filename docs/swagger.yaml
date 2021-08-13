@@ -1,6 +1,6 @@
 basePath: /
 definitions:
-  model.ApiResponse:
+  api.ErrorResponse:
     properties:
       code:
         example: 400
@@ -10,7 +10,7 @@ definitions:
         format: string
         type: string
     type: object
-  model.CreateMarkdownSnippet:
+  md.CreateMDReq:
     properties:
       body:
         description: Markdown body to save.
@@ -20,16 +20,40 @@ definitions:
     required:
     - body
     type: object
-  model.MarkdownSnippet:
+  md.MDListItem:
+    properties:
+      createDate:
+        description: Date markdown snippet was created
+        format: date-time
+        type: string
+      id:
+        description: Markdown snippet guid.
+        format: uuid
+        type: string
+    type: object
+  md.MarkdownSnippet:
     properties:
       body:
         description: Markdown body to save.
-        minLength: 1
+        example: |-
+          # Markdown Snippet
+          Some Text
         type: string
       createDate:
         description: Date markdown snippet was created
         format: date-time
-        readOnly: true
+        type: string
+      id:
+        description: Markdown snippet guid.
+        format: uuid
+        type: string
+    type: object
+  md.UpdateMDReq:
+    properties:
+      body:
+        description: Markdown body to save.
+        maxLength: 1024
+        minLength: 1
         type: string
       id:
         description: Markdown snippet guid.
@@ -37,31 +61,7 @@ definitions:
         type: string
     required:
     - body
-    type: object
-  model.MarkdownSnippetListItem:
-    properties:
-      createDate:
-        description: Date markdown snippet was created
-        format: date-time
-        readOnly: true
-        type: string
-      id:
-        description: Markdown snippet guid.
-        format: uuid
-        type: string
-    type: object
-  model.UpdateMarkdownSnippet:
-    properties:
-      body:
-        description: Markdown body to save.
-        minLength: 1
-        type: string
-      id:
-        description: Markdown snippet guid.
-        format: uuid
-        type: string
-    required:
-    - body
+    - id
     type: object
 host: localhost:3000
 info:
@@ -81,16 +81,16 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/model.MarkdownSnippetListItem'
+              $ref: '#/definitions/md.MDListItem'
             type: array
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/model.ApiResponse'
+            $ref: '#/definitions/api.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/model.ApiResponse'
+            $ref: '#/definitions/api.ErrorResponse'
       summary: Retrieve All Markdown Snippets
       tags:
       - md
@@ -103,26 +103,26 @@ paths:
         name: message
         required: true
         schema:
-          $ref: '#/definitions/model.UpdateMarkdownSnippet'
+          $ref: '#/definitions/md.UpdateMDReq'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.MarkdownSnippet'
+            $ref: '#/definitions/md.MarkdownSnippet'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/model.ApiResponse'
+            $ref: '#/definitions/api.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/model.ApiResponse'
+            $ref: '#/definitions/api.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/model.ApiResponse'
+            $ref: '#/definitions/api.ErrorResponse'
       summary: Updates a markdown snippet
       tags:
       - md
@@ -135,22 +135,22 @@ paths:
         name: message
         required: true
         schema:
-          $ref: '#/definitions/model.CreateMarkdownSnippet'
+          $ref: '#/definitions/md.CreateMDReq'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/model.MarkdownSnippet'
+            $ref: '#/definitions/md.MarkdownSnippet'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/model.ApiResponse'
+            $ref: '#/definitions/api.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/model.ApiResponse'
+            $ref: '#/definitions/api.ErrorResponse'
       summary: Create new a markdown snippet
       tags:
       - md
@@ -172,7 +172,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/model.ApiResponse'
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
       summary: Removes MarkdownSnippet permanantly
       tags:
       - md
@@ -191,15 +195,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.MarkdownSnippet'
+            $ref: '#/definitions/md.MarkdownSnippet'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/model.ApiResponse'
+            $ref: '#/definitions/api.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/model.ApiResponse'
+            $ref: '#/definitions/api.ErrorResponse'
       summary: Retrieve Markdown Snippet
       tags:
       - md

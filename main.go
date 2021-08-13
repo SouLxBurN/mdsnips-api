@@ -2,9 +2,10 @@ package main
 
 import (
 	"os"
-	"soulxsnips/src/route"
 
-	_ "soulxsnips/docs"
+	"github.com/soulxburn/soulxsnips/api"
+
+	_ "github.com/soulxburn/soulxsnips/docs"
 
 	swagger "github.com/arsmn/fiber-swagger/v2"
 	"github.com/gofiber/fiber/v2"
@@ -17,9 +18,9 @@ import (
 // @host localhost:3000
 // @BasePath /
 func main() {
-	app := fiber.New()
-	app.Get("/swagger/*", swagger.Handler)
-	route.Configure(app)
+	fiberApp := fiber.New()
+	fiberApp.Get("/swagger/*", swagger.Handler)
+	api.ConfigureRoutes(fiberApp)
 
 	var port string
 	if len(os.Args) > 1 {
@@ -27,5 +28,5 @@ func main() {
 	} else {
 		port = ":3000"
 	}
-	app.Listen(port)
+	fiberApp.Listen(port)
 }
