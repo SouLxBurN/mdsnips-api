@@ -3,10 +3,7 @@ package md
 import (
 	"context"
 	"errors"
-	"log"
 	"time"
-
-	"github.com/soulxburn/soulxsnips/client"
 
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
@@ -14,10 +11,25 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+const (
+	database   = "soulxsnips"
+	collection = "markdown"
+)
+
+type MDService struct {
+	client *mongo.Client
+}
+
+// InitMDService Creates an instance of a MDService
+// Requires a reference to a mongo.Client instance
+func InitMDService(mClient *mongo.Client) *MDService {
+	return &MDService{client: mClient}
+}
+
 // CreateMarkdownSnippet
 // Errors are returned to the caller
-func CreateMarkdownSnippet(mdSnip *CreateMDReq) (*MarkdownSnippet, error) {
-	mdCollection := getMarkdownCollection()
+func (m *MDService) CreateMarkdownSnippet(mdSnip *CreateMDReq) (*MarkdownSnippet, error) {
+	mdCollection := getMarkdownCollection(m.client)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
@@ -37,8 +49,8 @@ func CreateMarkdownSnippet(mdSnip *CreateMDReq) (*MarkdownSnippet, error) {
 
 // GetMarkdownSnippet
 // Errors are returned to the caller
-func GetMarkdownSnippet(uuid string) (*MarkdownSnippet, error) {
-	mdCollection := getMarkdownCollection()
+func (m *MDService) GetMarkdownSnippet(uuid string) (*MarkdownSnippet, error) {
+	mdCollection := getMarkdownCollection(m.client)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
@@ -56,8 +68,8 @@ func GetMarkdownSnippet(uuid string) (*MarkdownSnippet, error) {
 // GetAllMarkdownSnippets
 // Gets all Markdown Snippets without body
 // Errors are returned to the caller
-func GetAllMarkdownSnippets() (*[]MDListItem, error) {
-	mdCollection := getMarkdownCollection()
+func (m *MDService) GetAllMarkdownSnippets() (*[]MDListItem, error) {
+	mdCollection := getMarkdownCollection(m.client)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
@@ -81,13 +93,13 @@ func GetAllMarkdownSnippets() (*[]MDListItem, error) {
 
 // UpdateMarkdownSnippet
 // Errors are returned to the caller
-func UpdateMarkdownSnippet(patch *UpdateMDReq) (*MarkdownSnippet, error) {
-	mdCollection := getMarkdownCollection()
+func (m *MDService) UpdateMarkdownSnippet(patch *UpdateMDReq) (*MarkdownSnippet, error) {
+	mdCollection := getMarkdownCollection(m.client)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
 	// Get Existing Snippet
-	snippet, err := GetMarkdownSnippet(patch.ID)
+	snippet, err := m.GetMarkdownSnippet(patch.ID)
 	if snippet == nil && err == nil {
 		return nil, errors.New("Markdown Snippet does not exist")
 	}
@@ -107,17 +119,13 @@ func UpdateMarkdownSnippet(patch *UpdateMDReq) (*MarkdownSnippet, error) {
 
 // DeleteMarkdownSnippet
 // Errors are returned to the caller
-func DeleteMarkdownSnippet(uuid string) {
+func (m *MDService) DeleteMarkdownSnippet(uuid string) {
 
 }
 
 // getMarkdownCollection
+// Accepts a mongo.Client reference
 // Returns a reference to the `soulxsnips.markdown` collection.
-func getMarkdownCollection() *mongo.Collection {
-	mongo, err := client.GetMongoClient()
-	if err != nil {
-		log.Fatal("Unable to Connect to MongoDB")
-	}
-
-	return mongo.Database("soulxsnips").Collection("markdown")
+func getMarkdownCollection(mClient *mongo.Client) *mongo.Collection {
+	return mClient.Database("soulxsnips").Collection("markdown")
 }
