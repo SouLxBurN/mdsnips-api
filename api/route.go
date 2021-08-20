@@ -12,7 +12,7 @@ import (
 // Imports and configures various routes for
 // all modules.
 func ConfigureRoutes(app *fiber.App) {
-	mClient, err := client.GetMongoClient()
+	mClient, err := client.InitMongoClient("localhost", "27017", "soulxburn", "password")
 	if err != nil {
 		log.Fatal("Failed to establish connection to Mongo")
 	}
