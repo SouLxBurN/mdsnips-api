@@ -68,7 +68,7 @@ func (m *MDService) GetMarkdownSnippet(uuid string) (*MarkdownSnippet, error) {
 // GetAllMarkdownSnippets
 // Gets all Markdown Snippets without body
 // Errors are returned to the caller
-func (m *MDService) GetAllMarkdownSnippets() (*[]MDListItem, error) {
+func (m *MDService) GetAllMarkdownSnippets() ([]MDListItem, error) {
 	mdCollection := getMarkdownCollection(m.client)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
@@ -88,7 +88,7 @@ func (m *MDService) GetAllMarkdownSnippets() (*[]MDListItem, error) {
 		return nil, err
 	}
 
-	return &snippets, nil
+	return snippets, nil
 }
 
 // UpdateMarkdownSnippet
