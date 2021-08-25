@@ -260,7 +260,8 @@ var doc = `{
                     "description": "Markdown body to save.",
                     "type": "string",
                     "maxLength": 1024,
-                    "minLength": 1
+                    "minLength": 1,
+                    "example": "# Markdown Snippet\nSome Text"
                 }
             }
         },
@@ -310,7 +311,8 @@ var doc = `{
                     "description": "Markdown body to save.",
                     "type": "string",
                     "maxLength": 1024,
-                    "minLength": 1
+                    "minLength": 1,
+                    "example": "# Markdown Snippet\nSome Text"
                 },
                 "id": {
                     "description": "Markdown snippet guid.",

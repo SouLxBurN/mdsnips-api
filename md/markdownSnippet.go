@@ -23,7 +23,7 @@ type MDListItem struct {
 // CreateMDReq
 type CreateMDReq struct {
 	// Markdown body to save.
-	Body string `json:"body" validate:"required,min=1,max=1024" minLength:"1" maxLength:"1024"`
+	Body string `json:"body" validate:"required,min=1,max=1024" minLength:"1" maxLength:"1024" example:"# Markdown Snippet\nSome Text"`
 }
 
 // UpdateMarkdownSnippet
@@ -31,5 +31,5 @@ type UpdateMDReq struct {
 	// Markdown snippet guid.
 	ID string `json:"id,omitempty" format:"uuid" validate:"required"`
 	// Markdown body to save.
-	Body string `json:"body" validate:"required,min=1,max=1024" minLength:"1" maxLength:"1024"`
+	Body string `json:"body" validate:"required,min=1,max=1024" minLength:"1" maxLength:"1024" example:"# Markdown Snippet\nSome Text"`
 }

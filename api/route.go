@@ -2,6 +2,7 @@ package api
 
 import (
 	"log"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/soulxburn/soulxsnips/client"
@@ -12,7 +13,11 @@ import (
 // Imports and configures various routes for
 // all modules.
 func ConfigureRoutes(app *fiber.App) {
-	mClient, err := client.InitMongoClient("localhost", "27017", "soulxburn", "password")
+	mongoHost := os.Getenv("SOULXSNIPS_MONGO_HOST")
+	mongoPort := os.Getenv("SOULXSNIPS_MONGO_PORT")
+	mongoUser := os.Getenv("SOULXSNIPS_MONGO_USER")
+	mongoPass := os.Getenv("SOULXSNIPS_MONGO_PASS")
+	mClient, err := client.InitMongoClient(mongoHost, mongoPort, mongoUser, mongoPass)
 	if err != nil {
 		log.Fatal("Failed to establish connection to Mongo")
 	}

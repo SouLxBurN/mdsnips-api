@@ -13,6 +13,9 @@ definitions:
     properties:
       body:
         description: Markdown body to save.
+        example: |-
+          # Markdown Snippet
+          Some Text
         maxLength: 1024
         minLength: 1
         type: string
@@ -51,6 +54,9 @@ definitions:
     properties:
       body:
         description: Markdown body to save.
+        example: |-
+          # Markdown Snippet
+          Some Text
         maxLength: 1024
         minLength: 1
         type: string

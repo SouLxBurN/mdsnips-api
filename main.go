@@ -5,7 +5,6 @@ import (
 	"strconv"
 
 	"github.com/soulxburn/soulxsnips/api"
-
 	_ "github.com/soulxburn/soulxsnips/docs"
 
 	swagger "github.com/arsmn/fiber-swagger/v2"
@@ -20,7 +19,10 @@ import (
 // @BasePath
 func main() {
 	fiberApp := fiber.New()
+
 	fiberApp.Get("/swagger/*", swagger.Handler)
+
+	api.ConfigureMiddleware(fiberApp)
 	api.ConfigureBasicAuth(fiberApp)
 	api.ConfigureRoutes(fiberApp)
 
