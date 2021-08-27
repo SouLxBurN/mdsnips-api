@@ -2,8 +2,10 @@ package main
 
 import (
 	"flag"
+	"log"
 	"strconv"
 
+	"github.com/joho/godotenv"
 	"github.com/soulxburn/soulxsnips/api"
 	_ "github.com/soulxburn/soulxsnips/docs"
 
@@ -18,6 +20,9 @@ import (
 // @host localhost:3000
 // @BasePath
 func main() {
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	fiberApp := fiber.New()
 
 	fiberApp.Get("/swagger/*", swagger.Handler)

@@ -13,13 +13,11 @@ import (
 
 // MongoTestContainer
 // Container - Reference to GenericContainer Object
-// Host - IP of the running container
-// Port - Port of the running container
+// ConnectionString - ConnectionString to be passed to mongo client
 // NOTE: Terminate the Container reference when done.
 type MongoTestContainer struct {
 	Container testcontainers.Container
-	Host      string
-	Port      string
+	ConnectionString      string
 }
 
 // setupMongoTestContainer Creates a mongo test container
@@ -59,5 +57,6 @@ func SetupMongoTestContainer() (*MongoTestContainer, error) {
 		return nil, err
 	}
 
-	return &MongoTestContainer{Container: mCont, Host: ip, Port: port.Port()}, nil
+	connString := fmt.Sprintf("mongodb://%s:%s", ip, port)
+	return &MongoTestContainer{Container: mCont, ConnectionString: connString}, nil
 }

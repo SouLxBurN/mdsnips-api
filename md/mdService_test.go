@@ -21,7 +21,8 @@ func SetupMDService(t *testing.T) (*MDService, func(t *testing.T)) {
 	if err != nil {
 		log.Fatal("Failed to initialize mongo container")
 	}
-	mClient, err := client.InitMongoClient(mCont.Host, mCont.Port, "", "")
+
+	mClient, err := client.InitMongoClient(mCont.ConnectionString)
 	if err != nil {
 		log.Fatal("Failed to connection to mongo container")
 	}

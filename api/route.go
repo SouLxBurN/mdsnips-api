@@ -13,11 +13,8 @@ import (
 // Imports and configures various routes for
 // all modules.
 func ConfigureRoutes(app *fiber.App) {
-	mongoHost := os.Getenv("SOULXSNIPS_MONGO_HOST")
-	mongoPort := os.Getenv("SOULXSNIPS_MONGO_PORT")
-	mongoUser := os.Getenv("SOULXSNIPS_MONGO_USER")
-	mongoPass := os.Getenv("SOULXSNIPS_MONGO_PASS")
-	mClient, err := client.InitMongoClient(mongoHost, mongoPort, mongoUser, mongoPass)
+	mongoConn := os.Getenv("SOULXSNIPS_MONGO_CONN")
+	mClient, err := client.InitMongoClient(mongoConn)
 	if err != nil {
 		log.Fatal("Failed to establish connection to Mongo")
 	}
