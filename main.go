@@ -24,7 +24,7 @@ func main() {
     docs.SwaggerInfo.Host="localhost:" + strconv.Itoa(*port)
 
 	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
+		log.Println("No .env file found")
 	}
 	fiberApp := fiber.New()
 
@@ -33,7 +33,6 @@ func main() {
 	api.ConfigureMiddleware(fiberApp)
 	api.ConfigureBasicAuth(fiberApp)
 	api.ConfigureRoutes(fiberApp)
-
 
 	fiberApp.Listen(":" + strconv.Itoa(*port))
 }
