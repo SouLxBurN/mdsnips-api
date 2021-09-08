@@ -253,7 +253,8 @@ var doc = `{
         "md.CreateMDReq": {
             "type": "object",
             "required": [
-                "body"
+                "body",
+                "title"
             ],
             "properties": {
                 "body": {
@@ -262,6 +263,13 @@ var doc = `{
                     "maxLength": 1024,
                     "minLength": 1,
                     "example": "# Markdown Snippet\nSome Text"
+                },
+                "title": {
+                    "description": "Markdown snippet title.",
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 1,
+                    "example": "SouLxBurN Is Awesome!"
                 }
             }
         },
@@ -277,6 +285,11 @@ var doc = `{
                     "description": "Markdown snippet guid.",
                     "type": "string",
                     "format": "uuid"
+                },
+                "title": {
+                    "description": "Markdown snippet title.",
+                    "type": "string",
+                    "example": "SouLxBurN Is Awesome!"
                 }
             }
         },
@@ -289,7 +302,7 @@ var doc = `{
                     "example": "# Markdown Snippet\nSome Text"
                 },
                 "createDate": {
-                    "description": "Date markdown snippet was created",
+                    "description": "Date markdown snippet was created.",
                     "type": "string",
                     "format": "date-time"
                 },
@@ -297,6 +310,11 @@ var doc = `{
                     "description": "Markdown snippet guid.",
                     "type": "string",
                     "format": "uuid"
+                },
+                "title": {
+                    "description": "Markdown snippet title.",
+                    "type": "string",
+                    "example": "SouLxBurN Is Awesome!"
                 }
             }
         },
@@ -304,7 +322,8 @@ var doc = `{
             "type": "object",
             "required": [
                 "body",
-                "id"
+                "id",
+                "title"
             ],
             "properties": {
                 "body": {
@@ -318,6 +337,13 @@ var doc = `{
                     "description": "Markdown snippet guid.",
                     "type": "string",
                     "format": "uuid"
+                },
+                "title": {
+                    "description": "Markdown snippet title.",
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 1,
+                    "example": "SouLxBurN Is Awesome!"
                 }
             }
         }
@@ -341,7 +367,7 @@ type swaggerInfo struct {
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
 	Version:     "1.0",
-	Host:        "localhost:3000",
+	Host:        "",
 	BasePath:    "",
 	Schemes:     []string{},
 	Title:       "SouLxSnippets",

@@ -19,8 +19,15 @@ definitions:
         maxLength: 1024
         minLength: 1
         type: string
+      title:
+        description: Markdown snippet title.
+        example: SouLxBurN Is Awesome!
+        maxLength: 64
+        minLength: 1
+        type: string
     required:
     - body
+    - title
     type: object
   md.MDListItem:
     properties:
@@ -32,6 +39,10 @@ definitions:
         description: Markdown snippet guid.
         format: uuid
         type: string
+      title:
+        description: Markdown snippet title.
+        example: SouLxBurN Is Awesome!
+        type: string
     type: object
   md.MarkdownSnippet:
     properties:
@@ -42,12 +53,16 @@ definitions:
           Some Text
         type: string
       createDate:
-        description: Date markdown snippet was created
+        description: Date markdown snippet was created.
         format: date-time
         type: string
       id:
         description: Markdown snippet guid.
         format: uuid
+        type: string
+      title:
+        description: Markdown snippet title.
+        example: SouLxBurN Is Awesome!
         type: string
     type: object
   md.UpdateMDReq:
@@ -64,11 +79,17 @@ definitions:
         description: Markdown snippet guid.
         format: uuid
         type: string
+      title:
+        description: Markdown snippet title.
+        example: SouLxBurN Is Awesome!
+        maxLength: 64
+        minLength: 1
+        type: string
     required:
     - body
     - id
+    - title
     type: object
-host: localhost:3000
 info:
   contact: {}
   description: Backend API for storing and retrieving markdown snippets

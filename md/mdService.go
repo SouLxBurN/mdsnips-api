@@ -36,6 +36,7 @@ func (m *MDService) CreateMarkdownSnippet(mdSnip *CreateMDReq) (*MarkdownSnippet
 	newSnip := &MarkdownSnippet{
 		ID:         uuid.New().String(),
 		Body:       mdSnip.Body,
+        Title:      mdSnip.Title,
 		CreateDate: time.Now(),
 	}
 
@@ -75,7 +76,7 @@ func (m *MDService) GetAllMarkdownSnippets() ([]MDListItem, error) {
 
 	snippets := make([]MDListItem, 0)
 	filter := bson.D{}
-	opts := options.Find().SetProjection(bson.M{"id": 1, "createDate": 1})
+    opts := options.Find().SetProjection(bson.M{"id": 1, "title": 1, "createDate": 1})
 	cursor, err := mdCollection.Find(ctx, filter, opts)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -105,6 +106,7 @@ func (m *MDService) UpdateMarkdownSnippet(patch *UpdateMDReq) (*MarkdownSnippet,
 	}
 
 	// Update Fields
+    snippet.Title = patch.Title
 	snippet.Body = patch.Body
 
 	filter := bson.D{{Key: "id", Value: snippet.ID}}
