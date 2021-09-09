@@ -18,17 +18,21 @@ import (
 // @tag.name md
 // @BasePath
 func main() {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "3000"
-	}
-	docs.SwaggerInfo.Host = "localhost:" + port
-
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found")
 	}
-	fiberApp := fiber.New()
+    host := os.Getenv("HOST")
+	port := os.Getenv("PORT")
+    if host == "" {
+        host = "localhost"
+    }
+	if port == "" {
+		port = "3000"
+	}
 
+	docs.SwaggerInfo.Host = host + ":" + port
+
+	fiberApp := fiber.New()
 	fiberApp.Get("/swagger/*", swagger.Handler)
 
 	api.ConfigureMiddleware(fiberApp)
