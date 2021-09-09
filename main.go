@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"strings"
 
 	"github.com/joho/godotenv"
 	"github.com/soulxburn/soulxsnips/api"
@@ -21,16 +22,15 @@ func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found")
 	}
-    host := os.Getenv("HOST")
 	port := os.Getenv("PORT")
-    if host == "" {
-        host = "localhost"
-    }
 	if port == "" {
 		port = "3000"
 	}
-
-	docs.SwaggerInfo.Host = host + ":" + port
+    host := os.Getenv("HOST")
+    if host == "" || strings.Contains(host, "localhost") {
+        host = "localhost:" + port
+    }
+	docs.SwaggerInfo.Host = host
 
 	fiberApp := fiber.New()
 	fiberApp.Get("/swagger/*", swagger.Handler)
