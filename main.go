@@ -1,9 +1,8 @@
 package main
 
 import (
-	"flag"
 	"log"
-	"strconv"
+	"os"
 
 	"github.com/joho/godotenv"
 	"github.com/soulxburn/soulxsnips/api"
@@ -19,9 +18,11 @@ import (
 // @tag.name md
 // @BasePath
 func main() {
-	port := flag.Int("port", 3000, "port to listen on")
-	flag.Parse()
-    docs.SwaggerInfo.Host="localhost:" + strconv.Itoa(*port)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
+	}
+	docs.SwaggerInfo.Host = "localhost:" + port
 
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found")
@@ -34,5 +35,5 @@ func main() {
 	api.ConfigureBasicAuth(fiberApp)
 	api.ConfigureRoutes(fiberApp)
 
-	fiberApp.Listen(":" + strconv.Itoa(*port))
+	fiberApp.Listen(":" + port)
 }
