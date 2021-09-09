@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
 	"strings"
 
@@ -34,6 +35,9 @@ func main() {
 
 	fiberApp := fiber.New()
 	fiberApp.Get("/swagger/*", swagger.Handler)
+    fiberApp.All("/", func(ctx *fiber.Ctx) error {
+        return ctx.Redirect("/swagger/index.html", http.StatusMovedPermanently)
+    })
 
 	api.ConfigureMiddleware(fiberApp)
 	api.ConfigureBasicAuth(fiberApp)
