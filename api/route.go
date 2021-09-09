@@ -2,6 +2,7 @@ package api
 
 import (
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/gofiber/fiber/v2"
@@ -21,6 +22,10 @@ func ConfigureRoutes(app *fiber.App) {
 	mdService := md.InitMDService(mClient)
 	mdHandlers := md.InitMDHandlers(mdService)
 
+    // Redirect root requests to swagger documentation
+    app.All("/", func(ctx *fiber.Ctx) error {
+        return ctx.Redirect("/swagger/index.html", http.StatusMovedPermanently)
+    })
 	app.Post("/md", mdHandlers.CreateMDHandler)
 	app.Patch("/md", mdHandlers.UpdateMDHandler)
 	app.Get("/md/:id", mdHandlers.GetMDHandler)
