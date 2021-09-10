@@ -260,7 +260,7 @@ var doc = `{
                 "body": {
                     "description": "Markdown body to save.",
                     "type": "string",
-                    "maxLength": 1024,
+                    "maxLength": 64000,
                     "minLength": 1,
                     "example": "# Markdown Snippet\nSome Text"
                 },
@@ -315,6 +315,11 @@ var doc = `{
                     "description": "Markdown snippet title.",
                     "type": "string",
                     "example": "SouLxBurN Is Awesome!"
+                },
+                "updateKey": {
+                    "description": "Update hash key allowing the snippet to be updated.",
+                    "type": "string",
+                    "format": "uuid"
                 }
             }
         },
@@ -323,13 +328,14 @@ var doc = `{
             "required": [
                 "body",
                 "id",
-                "title"
+                "title",
+                "updateKey"
             ],
             "properties": {
                 "body": {
                     "description": "Markdown body to save.",
                     "type": "string",
-                    "maxLength": 1024,
+                    "maxLength": 64000,
                     "minLength": 1,
                     "example": "# Markdown Snippet\nSome Text"
                 },
@@ -344,6 +350,11 @@ var doc = `{
                     "maxLength": 64,
                     "minLength": 1,
                     "example": "SouLxBurN Is Awesome!"
+                },
+                "updateKey": {
+                    "description": "UpdateKey required for updating snippet.",
+                    "type": "string",
+                    "format": "uuid"
                 }
             }
         }

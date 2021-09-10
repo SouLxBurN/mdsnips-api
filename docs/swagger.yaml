@@ -16,7 +16,7 @@ definitions:
         example: |-
           # Markdown Snippet
           Some Text
-        maxLength: 1024
+        maxLength: 64000
         minLength: 1
         type: string
       title:
@@ -64,6 +64,10 @@ definitions:
         description: Markdown snippet title.
         example: SouLxBurN Is Awesome!
         type: string
+      updateKey:
+        description: Update hash key allowing the snippet to be updated.
+        format: uuid
+        type: string
     type: object
   md.UpdateMDReq:
     properties:
@@ -72,7 +76,7 @@ definitions:
         example: |-
           # Markdown Snippet
           Some Text
-        maxLength: 1024
+        maxLength: 64000
         minLength: 1
         type: string
       id:
@@ -85,10 +89,15 @@ definitions:
         maxLength: 64
         minLength: 1
         type: string
+      updateKey:
+        description: UpdateKey required for updating snippet.
+        format: uuid
+        type: string
     required:
     - body
     - id
     - title
+    - updateKey
     type: object
 info:
   contact: {}

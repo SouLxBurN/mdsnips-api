@@ -121,14 +121,18 @@ func (m *MDHandlers) UpdateMDHandler(ctx *fiber.Ctx) error {
 		return ctx.JSON(errs)
 	}
 
-	updatedSnippet, err := m.mdService.UpdateMarkdownSnippet(patchSnippet)
-	if err != nil {
-		log.Printf("Failed in update MarkdownSnippet %s: %s", patchSnippet.ID, err)
-		ctx.Status(http.StatusBadRequest)
-		return fiber.NewError(http.StatusInternalServerError, err.Error())
-	}
+    if !m.mdService.ValidateIdAndKey(patchSnippet.ID, patchSnippet.UpdateKey) {
+        return fiber.NewError(http.StatusUnauthorized, "Invalid Update Key")
+    }
 
-	return ctx.JSON(updatedSnippet)
+    updatedSnippet, err := m.mdService.UpdateMarkdownSnippet(patchSnippet)
+    if err != nil {
+        log.Printf("Failed in update MarkdownSnippet %s: %s", patchSnippet.ID, err)
+        ctx.Status(http.StatusBadRequest)
+        return fiber.NewError(http.StatusInternalServerError, err.Error())
+    }
+
+    return ctx.JSON(updatedSnippet)
 }
 
 // DeleteMDHandler DELETE - Removes MarkdownSnippet permanantly

@@ -3,6 +3,9 @@ package md
 import (
 	"context"
 	"errors"
+	"fmt"
+	"hash/crc32"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -37,6 +40,7 @@ func (m *MDService) CreateMarkdownSnippet(mdSnip *CreateMDReq) (*MarkdownSnippet
 		ID:         uuid.New().String(),
 		Body:       mdSnip.Body,
         Title:      mdSnip.Title,
+        UpdateKey:  createUpdateKey(mdSnip.Body),
 		CreateDate: time.Now(),
 	}
 
@@ -57,7 +61,8 @@ func (m *MDService) GetMarkdownSnippet(uuid string) (*MarkdownSnippet, error) {
 
 	snippet := new(MarkdownSnippet)
 	filter := bson.D{{Key: "id", Value: uuid}}
-	if err := mdCollection.FindOne(ctx, filter).Decode(snippet); err != nil {
+    opts := options.FindOne().SetProjection(bson.M{"updateKey": 0})
+	if err := mdCollection.FindOne(ctx, filter, opts).Decode(snippet); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, nil
 		}
@@ -119,6 +124,25 @@ func (m *MDService) UpdateMarkdownSnippet(patch *UpdateMDReq) (*MarkdownSnippet,
 	return snippet, nil
 }
 
+// ValidateIdAndKey
+// Fetch by snippet by Id and validate against updateKey
+func (m *MDService) ValidateIdAndKey(uuid string, updateKey string) (bool) {
+	mdCollection := getMarkdownCollection(m.client)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	snippet := new(MarkdownSnippet)
+	filter := bson.D{{Key: "id", Value: uuid}}
+    opts := options.FindOne().SetProjection(bson.M{"updateKey": 1})
+	if err := mdCollection.FindOne(ctx, filter, opts).Decode(snippet); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return false
+		}
+		return false
+	}
+	return updateKey == snippet.UpdateKey
+}
+
 // DeleteMarkdownSnippet
 // Errors are returned to the caller
 func (m *MDService) DeleteMarkdownSnippet(uuid string) {
@@ -131,3 +155,13 @@ func (m *MDService) DeleteMarkdownSnippet(uuid string) {
 func getMarkdownCollection(mClient *mongo.Client) *mongo.Collection {
 	return mClient.Database("soulxsnips").Collection("markdown")
 }
+
+// createUpdateKey
+// Generates an update key based on the markdown content
+func createUpdateKey(content string) string {
+    content += strconv.Itoa(time.Now().Nanosecond())
+	algo := crc32.NewIEEE()
+	algo.Write([]byte(content))
+	return fmt.Sprintf("%x", algo.Sum32())
+}
+
