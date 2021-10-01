@@ -381,8 +381,8 @@ var SwaggerInfo = swaggerInfo{
 	Host:        "",
 	BasePath:    "",
 	Schemes:     []string{},
-	Title:       "SouLxSnippets",
-	Description: "Backend API for storing and retrieving markdown snippets",
+	Title:       "MDSnips",
+	Description: "Backend API for storing and retrieving markdown snippets.\\nBuilt live on stream @twitch.tv/soulxburn",
 }
 
 type s struct{}

@@ -10,8 +10,8 @@ import (
 // ConfigureBasicAuth
 // Configures and attaches gofiber basic auth middleware
 func ConfigureBasicAuth(app *fiber.App) {
-	baseUser := os.Getenv("SOULXSNIPS_USER")
-	basePass := os.Getenv("SOULXSNIPS_PASS")
+	baseUser := os.Getenv("MDSNIPS_USER")
+	basePass := os.Getenv("MDSNIPS_PASS")
 	users := map[string]string{
 		baseUser: basePass,
 	}

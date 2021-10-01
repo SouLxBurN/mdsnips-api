@@ -7,16 +7,16 @@ import (
 	"strings"
 
 	"github.com/joho/godotenv"
-	"github.com/soulxburn/soulxsnips/api"
-	"github.com/soulxburn/soulxsnips/docs"
+	"github.com/soulxburn/mdsnips/api"
+	"github.com/soulxburn/mdsnips/docs"
 
 	swagger "github.com/arsmn/fiber-swagger/v2"
 	"github.com/gofiber/fiber/v2"
 )
 
-// @title SouLxSnippets
+// @title MDSnips
 // @version 1.0
-// @description Backend API for storing and retrieving markdown snippets
+// @description API for storing and retrieving markdown snippets.\nBuilt live on stream @twitch.tv/soulxburn
 // @tag.name md
 // @BasePath
 func main() {
@@ -27,17 +27,17 @@ func main() {
 	if port == "" {
 		port = "3000"
 	}
-    host := os.Getenv("HOST")
-    if host == "" || strings.Contains(host, "localhost") {
-        host = "localhost:" + port
-    }
+	host := os.Getenv("HOST")
+	if host == "" || strings.Contains(host, "localhost") {
+		host = "localhost:" + port
+	}
 	docs.SwaggerInfo.Host = host
 
 	fiberApp := fiber.New()
 	fiberApp.Get("/swagger/*", swagger.Handler)
-    fiberApp.All("/", func(ctx *fiber.Ctx) error {
-        return ctx.Redirect("/swagger/index.html", http.StatusMovedPermanently)
-    })
+	fiberApp.All("/", func(ctx *fiber.Ctx) error {
+		return ctx.Redirect("/swagger/index.html", http.StatusMovedPermanently)
+	})
 
 	api.ConfigureMiddleware(fiberApp)
 	api.ConfigureBasicAuth(fiberApp)

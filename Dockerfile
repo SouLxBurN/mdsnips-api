@@ -5,6 +5,6 @@ COPY ./ ./
 
 RUN go install
 
-CMD "soulxsnips"
+CMD "mdsnips"
 
 EXPOSE 3000

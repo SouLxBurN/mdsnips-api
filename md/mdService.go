@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	database   = "soulxsnips"
+	database   = "mdsnips"
 	collection = "markdown"
 )
 
@@ -39,8 +39,8 @@ func (m *MDService) CreateMarkdownSnippet(mdSnip *CreateMDReq) (*MarkdownSnippet
 	newSnip := &MarkdownSnippet{
 		ID:         uuid.New().String(),
 		Body:       mdSnip.Body,
-        Title:      mdSnip.Title,
-        UpdateKey:  createUpdateKey(mdSnip.Body),
+		Title:      mdSnip.Title,
+		UpdateKey:  createUpdateKey(mdSnip.Body),
 		CreateDate: time.Now(),
 	}
 
@@ -61,7 +61,7 @@ func (m *MDService) GetMarkdownSnippet(uuid string) (*MarkdownSnippet, error) {
 
 	snippet := new(MarkdownSnippet)
 	filter := bson.D{{Key: "id", Value: uuid}}
-    opts := options.FindOne().SetProjection(bson.M{"updateKey": 0})
+	opts := options.FindOne().SetProjection(bson.M{"updateKey": 0})
 	if err := mdCollection.FindOne(ctx, filter, opts).Decode(snippet); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, nil
@@ -81,7 +81,7 @@ func (m *MDService) GetAllMarkdownSnippets() ([]MDListItem, error) {
 
 	snippets := make([]MDListItem, 0)
 	filter := bson.D{}
-    opts := options.Find().SetProjection(bson.M{"id": 1, "title": 1, "createDate": 1})
+	opts := options.Find().SetProjection(bson.M{"id": 1, "title": 1, "createDate": 1})
 	cursor, err := mdCollection.Find(ctx, filter, opts)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -111,7 +111,7 @@ func (m *MDService) UpdateMarkdownSnippet(patch *UpdateMDReq) (*MarkdownSnippet,
 	}
 
 	// Update Fields
-    snippet.Title = patch.Title
+	snippet.Title = patch.Title
 	snippet.Body = patch.Body
 
 	filter := bson.D{{Key: "id", Value: snippet.ID}}
@@ -126,14 +126,14 @@ func (m *MDService) UpdateMarkdownSnippet(patch *UpdateMDReq) (*MarkdownSnippet,
 
 // ValidateIdAndKey
 // Fetch by snippet by Id and validate against updateKey
-func (m *MDService) ValidateIdAndKey(uuid string, updateKey string) (bool) {
+func (m *MDService) ValidateIdAndKey(uuid string, updateKey string) bool {
 	mdCollection := getMarkdownCollection(m.client)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
 	snippet := new(MarkdownSnippet)
 	filter := bson.D{{Key: "id", Value: uuid}}
-    opts := options.FindOne().SetProjection(bson.M{"updateKey": 1})
+	opts := options.FindOne().SetProjection(bson.M{"updateKey": 1})
 	if err := mdCollection.FindOne(ctx, filter, opts).Decode(snippet); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return false
@@ -151,17 +151,16 @@ func (m *MDService) DeleteMarkdownSnippet(uuid string) {
 
 // getMarkdownCollection
 // Accepts a mongo.Client reference
-// Returns a reference to the `soulxsnips.markdown` collection.
+// Returns a reference to the `mdsnips.markdown` collection.
 func getMarkdownCollection(mClient *mongo.Client) *mongo.Collection {
-	return mClient.Database("soulxsnips").Collection("markdown")
+	return mClient.Database("mdsnips").Collection("markdown")
 }
 
 // createUpdateKey
 // Generates an update key based on the markdown content
 func createUpdateKey(content string) string {
-    content += strconv.Itoa(time.Now().Nanosecond())
+	content += strconv.Itoa(time.Now().Nanosecond())
 	algo := crc32.NewIEEE()
 	algo.Write([]byte(content))
 	return fmt.Sprintf("%x", algo.Sum32())
 }
-

@@ -5,8 +5,8 @@ import (
 	"log"
 	"testing"
 
-	"github.com/soulxburn/soulxsnips/client"
-	"github.com/soulxburn/soulxsnips/testutils"
+	"github.com/soulxburn/mdsnips/client"
+	"github.com/soulxburn/mdsnips/testutils"
 
 	"github.com/stretchr/testify/assert"
 )

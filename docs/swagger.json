@@ -1,8 +1,8 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "Backend API for storing and retrieving markdown snippets",
-        "title": "SouLxSnippets",
+        "description": "Backend API for storing and retrieving markdown snippets.\\nBuilt live on stream @twitch.tv/soulxburn",
+        "title": "MDSnips",
         "contact": {},
         "version": "1.0"
     },
