@@ -23,6 +23,28 @@ type MDService struct {
 	client *mongo.Client
 }
 
+type SortBy string
+
+const (
+	CreateDate_ASC  SortBy = "createDate_ASC"
+	CreateDate_DESC        = "createDate_DESC"
+)
+
+func (s *SortBy) validate() error {
+	switch *s {
+	case CreateDate_ASC, CreateDate_DESC:
+		return nil
+	}
+	return errors.New("SortBy value failed validation")
+}
+
+type MDSearchParams struct {
+	Text   string
+	Limit  int64
+	Skip   int64
+	SortBy SortBy
+}
+
 // InitMDService Creates an instance of a MDService
 // Requires a reference to a mongo.Client instance
 func InitMDService(mClient *mongo.Client) *MDService {
@@ -71,6 +93,7 @@ func (m *MDService) GetMarkdownSnippet(uuid string) (*MarkdownSnippet, error) {
 	return snippet, nil
 }
 
+// @Deprecated
 // GetAllMarkdownSnippets
 // Gets all Markdown Snippets without body
 // Errors are returned to the caller
@@ -82,6 +105,47 @@ func (m *MDService) GetAllMarkdownSnippets() ([]MDListItem, error) {
 	snippets := make([]MDListItem, 0)
 	filter := bson.D{}
 	opts := options.Find().SetProjection(bson.M{"id": 1, "title": 1, "createDate": 1})
+	cursor, err := mdCollection.Find(ctx, filter, opts)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	if err = cursor.All(ctx, &snippets); err != nil {
+		return nil, err
+	}
+
+	return snippets, nil
+}
+
+// SearchMarkdownSnippets
+// Searches through all Markdown Snippets and returns then without their body.
+// Errors are returned to the caller
+func (m *MDService) SearchMarkdownSnippets(searchParams MDSearchParams) ([]MDListItem, error) {
+	mdCollection := getMarkdownCollection(m.client)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	sortby := bson.D{}
+	switch searchParams.SortBy {
+	case CreateDate_ASC:
+		sortby = bson.D{{Key: "createDate", Value: 1}}
+	case CreateDate_DESC:
+		sortby = bson.D{{Key: "createDate", Value: -1}}
+	}
+
+	snippets := make([]MDListItem, 0)
+	filter := bson.D{}
+	if searchParams.Text != "" {
+		filter = bson.D{{Key: "$text", Value: bson.D{{Key: "$search", Value: searchParams.Text}}}}
+	}
+	opts := options.Find()
+	opts.SetProjection(bson.M{"id": 1, "title": 1, "createDate": 1})
+	opts.SetSort(sortby)
+	opts.SetSkip(searchParams.Skip)
+	opts.SetLimit(searchParams.Limit)
 	cursor, err := mdCollection.Find(ctx, filter, opts)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {

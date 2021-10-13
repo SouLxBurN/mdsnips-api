@@ -8,7 +8,10 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/soulxburn/mdsnips/api"
+	"github.com/soulxburn/mdsnips/client"
 	"github.com/soulxburn/mdsnips/docs"
+	"github.com/soulxburn/mdsnips/md"
+	"go.mongodb.org/mongo-driver/mongo"
 
 	swagger "github.com/arsmn/fiber-swagger/v2"
 	"github.com/gofiber/fiber/v2"
@@ -41,7 +44,24 @@ func main() {
 
 	api.ConfigureMiddleware(fiberApp)
 	api.ConfigureBasicAuth(fiberApp)
-	api.ConfigureRoutes(fiberApp)
+
+	mClient := getMongoConnection()
+	md.ConfigureIndexes(mClient)
+
+	mdService := md.InitMDService(mClient)
+	mdHandlers := md.InitMDHandlers(mdService)
+	mdHandlers.ConfigureRoutes(fiberApp)
 
 	fiberApp.Listen(":" + port)
+}
+
+// Initialize MongoClient
+func getMongoConnection() *mongo.Client {
+	mongoConn := os.Getenv("MDSNIPS_MONGO_CONN")
+	mClient, err := client.InitMongoClient(mongoConn)
+	if err != nil {
+		log.Fatal("Failed to establish connection to Mongo")
+	}
+
+	return mClient
 }

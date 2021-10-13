@@ -101,8 +101,8 @@ definitions:
     type: object
 info:
   contact: {}
-  description: Backend API for storing and retrieving markdown snippets.\nBuilt live
-    on stream @twitch.tv/soulxburn
+  description: API for storing and retrieving markdown snippets.\nBuilt live on stream
+    @twitch.tv/soulxburn
   title: MDSnips
   version: "1.0"
 paths:
@@ -110,6 +110,7 @@ paths:
     get:
       consumes:
       - application/json
+      deprecated: true
       produces:
       - application/json
       responses:
@@ -241,6 +242,52 @@ paths:
           schema:
             $ref: '#/definitions/api.ErrorResponse'
       summary: Retrieve Markdown Snippet
+      tags:
+      - md
+  /md/search:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Search Term
+        in: query
+        name: text
+        type: string
+      - default: 10
+        description: Number of Snippets
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Skip Number of Snippets
+        in: query
+        name: skip
+        type: integer
+      - description: Sort By
+        enum:
+        - createDate_ASC
+        - createDate_DESC
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/md.MDListItem'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      summary: Search, Sort, and paginate through MarkdownSnippets.
       tags:
       - md
 swagger: "2.0"

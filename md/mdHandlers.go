@@ -1,8 +1,10 @@
 package md
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/go-playground/validator"
 	"github.com/gofiber/fiber/v2"
@@ -16,6 +18,18 @@ type MDHandlers struct {
 // Requires a reference to a md.Service instance
 func InitMDHandlers(mdService *MDService) *MDHandlers {
 	return &MDHandlers{mdService: mdService}
+}
+
+// ConfiugureRoutes
+// Imports and configures various routes for
+// all modules.
+func (m *MDHandlers) ConfigureRoutes(app *fiber.App) {
+	app.Post("/md", m.CreateMDHandler)
+	app.Patch("/md", m.UpdateMDHandler)
+	app.Get("/md/search", m.SearchMDHandler)
+	app.Get("/md/:id", m.GetMDHandler)
+	app.Get("/md", m.GetAllMDHandler)
+	app.Delete("/md/:id", m.DeleteMDHandler)
 }
 
 // CreateMDHandler POST - creates a MarkdownSnippet from the provided body
@@ -79,6 +93,7 @@ func (m *MDHandlers) GetMDHandler(ctx *fiber.Ctx) error {
 }
 
 // GetAllMDHandler GET - Get All MarkdownSnippets Retrieval
+// @Deprecated
 // @Summary Retrieve All Markdown Snippets
 // @Accept json
 // @Produce json
@@ -91,6 +106,51 @@ func (m *MDHandlers) GetAllMDHandler(ctx *fiber.Ctx) error {
 	snippets, err := m.mdService.GetAllMarkdownSnippets()
 	if err != nil {
 		log.Printf("Error Retrieving All Markdown Snippet: %s", err)
+		ctx.Status(http.StatusInternalServerError)
+		return fiber.NewError(http.StatusBadRequest, err.Error())
+	}
+
+	return ctx.JSON(snippets)
+}
+
+// SearchMDHandler GET - Search for MarkdownSnippets
+// @Summary Search, Sort, and paginate through MarkdownSnippets.
+// @Param text query string false "Search Term"
+// @Param limit query int false "Number of Snippets" default(10)
+// @Param skip query int false "Skip Number of Snippets" default(0)
+// @Param sort query string false "Sort By" Enums(createDate_ASC, createDate_DESC)
+// @Accept json
+// @Produce json
+// @Tags md
+// @Success 200 {object} []MDListItem
+// @Failure 400 {object} api.ErrorResponse
+// @Failure 500 {object} api.ErrorResponse
+// @Router /md/search [get]
+func (m *MDHandlers) SearchMDHandler(ctx *fiber.Ctx) error {
+	limit, err := strconv.ParseInt(ctx.Query("limit", "10"), 10, 64)
+	if err != nil {
+		return fiber.NewError(http.StatusBadRequest, "limit: invalid value")
+	}
+	skip, err := strconv.ParseInt(ctx.Query("skip", "0"), 10, 64)
+	if err != nil {
+		return fiber.NewError(http.StatusBadRequest, "skip: invalid value")
+	}
+
+	sort := SortBy(ctx.Query("sort", CreateDate_DESC))
+	if err := sort.validate(); err != nil {
+		return fiber.NewError(http.StatusBadRequest, fmt.Sprintf("`%s` is not a valid value for sort", sort))
+	}
+
+	params := MDSearchParams{
+		Text:   ctx.Query("text"),
+		Limit:  limit,
+		Skip:   skip,
+		SortBy: sort,
+	}
+
+	snippets, err := m.mdService.SearchMarkdownSnippets(params)
+	if err != nil {
+		log.Printf("Error Searching for Markdown Snippets: %s", err)
 		ctx.Status(http.StatusInternalServerError)
 		return fiber.NewError(http.StatusBadRequest, err.Error())
 	}
@@ -121,18 +181,18 @@ func (m *MDHandlers) UpdateMDHandler(ctx *fiber.Ctx) error {
 		return ctx.JSON(errs)
 	}
 
-    if !m.mdService.ValidateIdAndKey(patchSnippet.ID, patchSnippet.UpdateKey) {
-        return fiber.NewError(http.StatusUnauthorized, "Invalid Update Key")
-    }
+	if !m.mdService.ValidateIdAndKey(patchSnippet.ID, patchSnippet.UpdateKey) {
+		return fiber.NewError(http.StatusUnauthorized, "Invalid Update Key")
+	}
 
-    updatedSnippet, err := m.mdService.UpdateMarkdownSnippet(patchSnippet)
-    if err != nil {
-        log.Printf("Failed in update MarkdownSnippet %s: %s", patchSnippet.ID, err)
-        ctx.Status(http.StatusBadRequest)
-        return fiber.NewError(http.StatusInternalServerError, err.Error())
-    }
+	updatedSnippet, err := m.mdService.UpdateMarkdownSnippet(patchSnippet)
+	if err != nil {
+		log.Printf("Failed in update MarkdownSnippet %s: %s", patchSnippet.ID, err)
+		ctx.Status(http.StatusBadRequest)
+		return fiber.NewError(http.StatusInternalServerError, err.Error())
+	}
 
-    return ctx.JSON(updatedSnippet)
+	return ctx.JSON(updatedSnippet)
 }
 
 // DeleteMDHandler DELETE - Removes MarkdownSnippet permanantly

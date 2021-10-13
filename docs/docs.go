@@ -36,6 +36,7 @@ var doc = `{
                     "md"
                 ],
                 "summary": "Retrieve All Markdown Snippets",
+                "deprecated": true,
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -140,6 +141,75 @@ var doc = `{
                     },
                     "404": {
                         "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/md/search": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "md"
+                ],
+                "summary": "Search, Sort, and paginate through MarkdownSnippets.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Search Term",
+                        "name": "text",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Number of Snippets",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Skip Number of Snippets",
+                        "name": "skip",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "createDate_ASC",
+                            "createDate_DESC"
+                        ],
+                        "type": "string",
+                        "description": "Sort By",
+                        "name": "sort",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/md.MDListItem"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/api.ErrorResponse"
                         }
@@ -382,7 +452,7 @@ var SwaggerInfo = swaggerInfo{
 	BasePath:    "",
 	Schemes:     []string{},
 	Title:       "MDSnips",
-	Description: "Backend API for storing and retrieving markdown snippets.\\nBuilt live on stream @twitch.tv/soulxburn",
+	Description: "API for storing and retrieving markdown snippets.\\nBuilt live on stream @twitch.tv/soulxburn",
 }
 
 type s struct{}
