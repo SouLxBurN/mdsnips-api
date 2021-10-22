@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -59,7 +58,7 @@ func (m *MDService) CreateMarkdownSnippet(mdSnip *CreateMDReq) (*MarkdownSnippet
 	defer cancel()
 
 	newSnip := &MarkdownSnippet{
-		ID:         uuid.New().String(),
+		ID:         createMDID(mdSnip.Title, mdSnip.Body),
 		Body:       mdSnip.Body,
 		Title:      mdSnip.Title,
 		UpdateKey:  createUpdateKey(mdSnip.Body),
@@ -76,13 +75,13 @@ func (m *MDService) CreateMarkdownSnippet(mdSnip *CreateMDReq) (*MarkdownSnippet
 
 // GetMarkdownSnippet
 // Errors are returned to the caller
-func (m *MDService) GetMarkdownSnippet(uuid string) (*MarkdownSnippet, error) {
+func (m *MDService) GetMarkdownSnippet(mdID string) (*MarkdownSnippet, error) {
 	mdCollection := getMarkdownCollection(m.client)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
 	snippet := new(MarkdownSnippet)
-	filter := bson.D{{Key: "id", Value: uuid}}
+	filter := bson.D{{Key: "id", Value: mdID}}
 	opts := options.FindOne().SetProjection(bson.M{"updateKey": 0})
 	if err := mdCollection.FindOne(ctx, filter, opts).Decode(snippet); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -189,14 +188,14 @@ func (m *MDService) UpdateMarkdownSnippet(patch *UpdateMDReq) (*MarkdownSnippet,
 }
 
 // ValidateIdAndKey
-// Fetch by snippet by Id and validate against updateKey
-func (m *MDService) ValidateIdAndKey(uuid string, updateKey string) bool {
+// Fetch snippet by Id and validate against updateKey
+func (m *MDService) ValidateIdAndKey(mdID string, updateKey string) bool {
 	mdCollection := getMarkdownCollection(m.client)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
 	snippet := new(MarkdownSnippet)
-	filter := bson.D{{Key: "id", Value: uuid}}
+	filter := bson.D{{Key: "id", Value: mdID}}
 	opts := options.FindOne().SetProjection(bson.M{"updateKey": 1})
 	if err := mdCollection.FindOne(ctx, filter, opts).Decode(snippet); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
@@ -209,8 +208,17 @@ func (m *MDService) ValidateIdAndKey(uuid string, updateKey string) bool {
 
 // DeleteMarkdownSnippet
 // Errors are returned to the caller
-func (m *MDService) DeleteMarkdownSnippet(uuid string) {
+func (m *MDService) DeleteMarkdownSnippet(mdID string, updateKey string) error {
+	mdCollection := getMarkdownCollection(m.client)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
 
+	filter := bson.D{{Key: "id", Value: mdID}}
+	if _, err := mdCollection.DeleteOne(ctx, filter); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // getMarkdownCollection
@@ -221,10 +229,19 @@ func getMarkdownCollection(mClient *mongo.Client) *mongo.Collection {
 }
 
 // createUpdateKey
-// Generates an update key based on the markdown content
+// Generates an update key based on the markdown content.
 func createUpdateKey(content string) string {
 	content += strconv.Itoa(time.Now().Nanosecond())
 	algo := crc32.NewIEEE()
 	algo.Write([]byte(content))
+	return fmt.Sprintf("%x", algo.Sum32())
+}
+
+// createMDID
+// Generates a ID/URL hash for the markdown snippet.
+func createMDID(title string, content string) string {
+	seed := title + content + strconv.Itoa(time.Now().Nanosecond())
+	algo := crc32.NewIEEE()
+	algo.Write([]byte(seed))
 	return fmt.Sprintf("%x", algo.Sum32())
 }

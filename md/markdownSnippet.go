@@ -34,11 +34,17 @@ type CreateMDReq struct {
 	Body string `json:"body" validate:"required,min=1,max=64000" minLength:"1" maxLength:"64000" example:"# Markdown Snippet\nSome Text"`
 }
 
-// UpdateMarkdownSnippet
+// UpdateMDReq
 type UpdateMDReq struct {
 	CreateMDReq
 	// Markdown snippet guid.
 	ID string `json:"id,omitempty" format:"uuid" validate:"required"`
 	// UpdateKey required for updating snippet.
+	UpdateKey string `json:"updateKey" format:"uuid" validate:"required"`
+}
+
+// DeleteMDReq
+type DeleteMDReq struct {
+	// UpdateKey required for deleting snippet.
 	UpdateKey string `json:"updateKey" format:"uuid" validate:"required"`
 }

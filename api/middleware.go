@@ -23,14 +23,23 @@ func ConfigureMiddleware(app *fiber.App) {
 	app.Use(cors.New())
 
 	app.Use(limiter.New(limiter.Config{
-		Max:        10,
-		Expiration: 30 * time.Second,
+		Max:        5,
+		Expiration: 60 * time.Second,
 		KeyGenerator: func(ctx *fiber.Ctx) string {
 			return getRequestIP(ctx)
 		},
 		LimitReached: func(ctx *fiber.Ctx) error {
 			log.Printf("Too many requests received from: %s\n", getRequestIP(ctx))
 			return ctx.SendStatus(http.StatusTooManyRequests)
+		},
+		Next: func(c *fiber.Ctx) bool {
+			method := c.Method()
+			if method == http.MethodGet ||
+				method == http.MethodOptions ||
+				method == http.MethodHead {
+				return true
+			}
+			return false
 		},
 	}))
 

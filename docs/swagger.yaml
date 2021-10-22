@@ -29,6 +29,15 @@ definitions:
     - body
     - title
     type: object
+  md.DeleteMDReq:
+    properties:
+      updateKey:
+        description: UpdateKey required for deleting snippet.
+        format: uuid
+        type: string
+    required:
+    - updateKey
+    type: object
   md.MDListItem:
     properties:
       createDate:
@@ -196,11 +205,17 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: Snippet uuid
+      - description: Snippet ID
         in: path
         name: id
         required: true
         type: string
+      - description: Delete Body
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/md.DeleteMDReq'
       produces:
       - application/json
       responses:
@@ -221,7 +236,7 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: Snippet uuid
+      - description: Snippet ID
         in: path
         name: id
         required: true

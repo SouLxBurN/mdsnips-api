@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/go-playground/validator"
 	"github.com/gofiber/fiber/v2"
+	"github.com/soulxburn/mdsnips/api"
 )
 
 type MDHandlers struct {
@@ -50,7 +50,7 @@ func (m *MDHandlers) CreateMDHandler(ctx *fiber.Ctx) error {
 		return fiber.NewError(http.StatusBadRequest, err.Error())
 	}
 
-	if errs := ValidateStruct(snippetRequest); errs != nil {
+	if errs := api.ValidateStruct(snippetRequest); errs != nil {
 		ctx.Status(http.StatusBadRequest)
 		return ctx.JSON(errs)
 	}
@@ -74,7 +74,7 @@ func (m *MDHandlers) CreateMDHandler(ctx *fiber.Ctx) error {
 // @Failure 400 {object} api.ErrorResponse
 // @Failure 500 {object} api.ErrorResponse
 // @Router /md/{id} [get]
-// @Param id path string true "Snippet uuid"
+// @Param id path string true "Snippet ID"
 func (m *MDHandlers) GetMDHandler(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 
@@ -176,7 +176,7 @@ func (m *MDHandlers) UpdateMDHandler(ctx *fiber.Ctx) error {
 		return fiber.NewError(http.StatusBadRequest, err.Error())
 	}
 
-	if errs := ValidateStruct(patchSnippet); errs != nil {
+	if errs := api.ValidateStruct(patchSnippet); errs != nil {
 		ctx.Status(http.StatusBadRequest)
 		return ctx.JSON(errs)
 	}
@@ -204,34 +204,31 @@ func (m *MDHandlers) UpdateMDHandler(ctx *fiber.Ctx) error {
 // @Failure 400 {object} api.ErrorResponse
 // @Failure 500 {object} api.ErrorResponse
 // @Router /md/{id} [delete]
-// @Param id path string true "Snippet uuid"
+// @Param id path string true "Snippet ID"
+// @Param message body DeleteMDReq true "Delete Body"
 func (m *MDHandlers) DeleteMDHandler(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
-	log.Printf("Deleting %s", id)
-	// TODO: Make service call to remove snippet.
+	deleteBody := new(DeleteMDReq)
+
+	if err := ctx.BodyParser(deleteBody); err != nil {
+		ctx.Status(http.StatusBadRequest)
+		return fiber.NewError(http.StatusBadRequest, err.Error())
+	}
+
+	if errs := api.ValidateStruct(deleteBody); errs != nil {
+		ctx.Status(http.StatusBadRequest)
+		return ctx.JSON(errs)
+	}
+
+	if !m.mdService.ValidateIdAndKey(id, deleteBody.UpdateKey) {
+		return fiber.NewError(http.StatusUnauthorized, "Invalid Update Key")
+	}
+
+	if err := m.mdService.DeleteMarkdownSnippet(id, deleteBody.UpdateKey); err != nil {
+		log.Printf("An error occurred when deleting %s", id)
+		return fiber.NewError(http.StatusInternalServerError, "Unexpected Error When Deleting Snippet")
+	}
 
 	ctx.Status(fiber.StatusNoContent)
 	return nil
-}
-
-type ErrorResponse struct {
-	FailedField string
-	Tag         string
-	Value       string
-}
-
-func ValidateStruct(v interface{}) []*ErrorResponse {
-	var errors []*ErrorResponse
-	validate := validator.New()
-	err := validate.Struct(v)
-	if err != nil {
-		for _, err := range err.(validator.ValidationErrors) {
-			var element ErrorResponse
-			element.FailedField = err.StructNamespace()
-			element.Tag = err.Tag()
-			element.Value = err.Param()
-			errors = append(errors, &element)
-		}
-	}
-	return errors
 }

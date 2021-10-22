@@ -238,7 +238,7 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Snippet uuid",
+                        "description": "Snippet ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -279,10 +279,19 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Snippet uuid",
+                        "description": "Snippet ID",
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "Delete Body",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/md.DeleteMDReq"
+                        }
                     }
                 ],
                 "responses": {
@@ -340,6 +349,19 @@ var doc = `{
                     "maxLength": 64,
                     "minLength": 1,
                     "example": "SouLxBurN Is Awesome!"
+                }
+            }
+        },
+        "md.DeleteMDReq": {
+            "type": "object",
+            "required": [
+                "updateKey"
+            ],
+            "properties": {
+                "updateKey": {
+                    "description": "UpdateKey required for deleting snippet.",
+                    "type": "string",
+                    "format": "uuid"
                 }
             }
         },
