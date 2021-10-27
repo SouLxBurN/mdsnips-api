@@ -37,12 +37,13 @@ func main() {
 	docs.SwaggerInfo.Host = host
 
 	fiberApp := fiber.New()
+	api.ConfigureMiddleware(fiberApp)
+
 	fiberApp.Get("/swagger/*", swagger.Handler)
 	fiberApp.All("/", func(ctx *fiber.Ctx) error {
 		return ctx.Redirect("/swagger/index.html", http.StatusMovedPermanently)
 	})
 
-	api.ConfigureMiddleware(fiberApp)
 	api.ConfigureBasicAuth(fiberApp)
 
 	mClient := getMongoConnection()

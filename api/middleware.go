@@ -1,8 +1,10 @@
 package api
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -16,6 +18,8 @@ import (
 // Configures various GoFiber middleware
 // i.e. Recover, Limiter, etc.
 func ConfigureMiddleware(app *fiber.App) {
+	env := os.Getenv("ENV")
+
 	app.Use(recover.New(recover.Config{
 		EnableStackTrace: true,
 	}))
@@ -43,11 +47,21 @@ func ConfigureMiddleware(app *fiber.App) {
 		},
 	}))
 
+	if env == "PROD" {
+		// Promoting http to https
+		app.Use(func(c *fiber.Ctx) error {
+			proto := c.Get("x-forwarded-proto")
+			if proto != "https" {
+				c.Redirect(fmt.Sprintf("https://%s%s", c.Hostname(), c.Path()), http.StatusMovedPermanently)
+			}
+			return nil
+		})
+	}
+
 	app.Use(logger.New(logger.Config{
 		TimeFormat: "2006-01-02T15:04:05-0700",
 		TimeZone:   "UTC",
 	}))
-
 }
 
 // getRequestIP
