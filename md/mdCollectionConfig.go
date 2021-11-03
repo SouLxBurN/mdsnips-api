@@ -29,5 +29,5 @@ func ConfigureIndexes(mClient *mongo.Client) {
 		fmt.Printf("Error Creating Text Index: %s", err)
 		return
 	}
-	fmt.Printf("Index Created: %s", name)
+	fmt.Printf("Index Created: %s\n", name)
 }

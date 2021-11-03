@@ -53,7 +53,9 @@ func main() {
 	mdHandlers := md.InitMDHandlers(mdService)
 	mdHandlers.ConfigureRoutes(fiberApp)
 
-	fiberApp.Listen(":" + port)
+	if err := fiberApp.Listen(":" + port); err != nil {
+		log.Fatal(err)
+	}
 }
 
 // Initialize MongoClient
@@ -61,7 +63,7 @@ func getMongoConnection() *mongo.Client {
 	mongoConn := os.Getenv("MDSNIPS_MONGO_CONN")
 	mClient, err := client.InitMongoClient(mongoConn)
 	if err != nil {
-		log.Fatal("Failed to establish connection to Mongo")
+		log.Fatal(err)
 	}
 
 	return mClient
