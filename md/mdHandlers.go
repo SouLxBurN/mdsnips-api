@@ -182,13 +182,20 @@ func (m *MDHandlers) UpdateMDHandler(ctx *fiber.Ctx) error {
 	}
 
 	if !m.mdService.ValidateIdAndKey(patchSnippet.ID, patchSnippet.UpdateKey) {
+		ctx.Status(http.StatusUnauthorized)
 		return fiber.NewError(http.StatusUnauthorized, "Invalid Update Key")
 	}
 
-	updatedSnippet, err := m.mdService.UpdateMarkdownSnippet(patchSnippet)
+	err := m.mdService.UpdateMarkdownSnippet(patchSnippet)
 	if err != nil {
 		log.Printf("Failed in update MarkdownSnippet %s: %s", patchSnippet.ID, err)
-		ctx.Status(http.StatusBadRequest)
+		ctx.Status(http.StatusInternalServerError)
+		return fiber.NewError(http.StatusInternalServerError, err.Error())
+	}
+
+	updatedSnippet, err := m.mdService.GetMarkdownSnippet(patchSnippet.ID)
+	if err != nil {
+		ctx.Status(http.StatusInternalServerError)
 		return fiber.NewError(http.StatusInternalServerError, err.Error())
 	}
 

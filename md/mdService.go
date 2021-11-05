@@ -162,29 +162,27 @@ func (m *MDService) SearchMarkdownSnippets(searchParams MDSearchParams) ([]MDLis
 
 // UpdateMarkdownSnippet
 // Errors are returned to the caller
-func (m *MDService) UpdateMarkdownSnippet(patch *UpdateMDReq) (*MarkdownSnippet, error) {
+func (m *MDService) UpdateMarkdownSnippet(patch *UpdateMDReq) error {
 	mdCollection := getMarkdownCollection(m.client)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	// Get Existing Snippet
-	snippet, err := m.GetMarkdownSnippet(patch.ID)
-	if snippet == nil && err == nil {
-		return nil, errors.New("Markdown Snippet does not exist")
+	// This probably isn't the best way to do this.
+	type updateSnippet struct {
+		Title string `bson:"title"`
+		Body  string `bson:"body"`
 	}
 
 	// Update Fields
-	snippet.Title = patch.Title
-	snippet.Body = patch.Body
+	updates := updateSnippet{patch.Title, patch.Body}
 
-	filter := bson.D{{Key: "id", Value: snippet.ID}}
-	update := bson.M{"$set": snippet}
-	_, err = mdCollection.UpdateOne(ctx, filter, update)
-	if err != nil {
-		return nil, err
+	filter := bson.D{{Key: "id", Value: patch.ID}}
+	update := bson.M{"$set": updates}
+	if _, err := mdCollection.UpdateOne(ctx, filter, update); err != nil {
+		return err
 	}
 
-	return snippet, nil
+	return nil
 }
 
 // ValidateIdAndKey
@@ -194,7 +192,7 @@ func (m *MDService) ValidateIdAndKey(mdID string, updateKey string) bool {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	snippet := new(MarkdownSnippet)
+	snippet := make(map[string]string)
 	filter := bson.D{{Key: "id", Value: mdID}}
 	opts := options.FindOne().SetProjection(bson.M{"updateKey": 1})
 	if err := mdCollection.FindOne(ctx, filter, opts).Decode(snippet); err != nil {
@@ -203,7 +201,7 @@ func (m *MDService) ValidateIdAndKey(mdID string, updateKey string) bool {
 		}
 		return false
 	}
-	return updateKey == snippet.UpdateKey
+	return updateKey == snippet["updateKey"]
 }
 
 // DeleteMarkdownSnippet
